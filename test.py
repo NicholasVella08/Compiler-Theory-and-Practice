@@ -52,9 +52,11 @@ class Lexer:
             return False, self.current_token, self.current_state
 
 
+
+
 transition_table = {}
 
-letter = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+letter = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 digit = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 hex = ['A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 multiplicativeOp = ['*', '/', 'and']
@@ -238,6 +240,7 @@ transition_table[(8, ' ')] = 55
 transition_table[(7, ' ')] = 55
 transition_table[(121, ' ')] = 122
 transition_table[(123, ' ')] = 55
+transition_table[(0, ' ')] = 0
 
 
 #transition_table[(36, '}')] = 200
@@ -468,6 +471,7 @@ transition_table[(202, '{')] = 201 #<Block>
 
 
 transition_table[(3, '}')] = 203
+transition_table[(0, '}')] = 203
 transition_table[(202, '}')] = 203
 transition_table[(203, '}')] = 203
 transition_table[(203, ' ')] = 128
@@ -482,11 +486,12 @@ transition_table[(49, ';')] = 31
 transition_table[(54, ';')] = 31
 transition_table[(3, ';')] = 31
 
+
 transition_table[(31, '}')] = 203
 
 
 
-accepting_states = {31, 203}
+accepting_states = {31, 203, 201}
 
 # lexer = Lexer(transition_table, accepting_states)
 # input_string = input("Enter a string to lex: ")
@@ -498,7 +503,7 @@ accepting_states = {31, 203}
 
 
 lexer = Lexer(transition_table, accepting_states)
-filename = input("Enter the name of the input file: ")
+filename = 'input.txt'
 with open(filename, 'r') as file:
     for line in file:
         line = line.strip()
