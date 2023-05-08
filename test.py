@@ -1,3 +1,4 @@
+from typing import List
 class Token:
     def __init__(self, token_type, value):
         self.type = token_type
@@ -7,49 +8,290 @@ class Token:
         return f"{self.type}({self.value})"
 
 
-# class Lexer:
-#     def __init__(self, transition_table, accepting_states):
-#         self.transition_table = transition_table
-#         self.accepting_states = accepting_states
-#         self.current_state = 0
-#         self.current_token = ''
+# # class Lexer:
+# #     def __init__(self, transition_table, accepting_states):
+# #         self.transition_table = transition_table
+# #         self.accepting_states = accepting_states
+# #         self.current_state = 0
+# #         self.current_token = ''
+# #
+# #     def get_next_token(self, input_string):
+# #         self.current_state = 0
+# #         self.current_token = ''
+# #         for char in input_string:
+# #             try:
+# #                 self.current_state = self.transition_table[(self.current_state, char)]
+# #                 self.current_token += char
+# #             except KeyError:
+# #                 return False, self.current_token, self.current_state
+# #         if self.current_state in self.accepting_states:
+# #             return True, self.current_token, self.current_state
+# #         else:
+# #             return False, self.current_token, self.current_state
 #
-#     def get_next_token(self, input_string):
-#         self.current_state = 0
-#         self.current_token = ''
-#         for char in input_string:
-#             try:
-#                 self.current_state = self.transition_table[(self.current_state, char)]
-#                 self.current_token += char
-#             except KeyError:
-#                 return False, self.current_token, self.current_state
-#         if self.current_state in self.accepting_states:
-#             return True, self.current_token, self.current_state
-#         else:
-#             return False, self.current_token, self.current_state
-
-
+class TokenType:
+    INT = 'INT'
+    PLUS = 'PLUS'
+    MINUS = 'MINUS'
+    MUL = 'MUL'
+    DIV = 'DIV'
+    LPAREN = 'LPAREN'
+    RPAREN = 'RPAREN'
+    EOF = 'EOF'
+    LET = 'LET'
+    VAR = 'VAR'
+    ASSIGN = 'ASSIGN'
+    SEMI = 'SEMI'
+tokensTable = []
 class Lexer:
     def __init__(self, transition_table, accepting_states):
         self.transition_table = transition_table
         self.accepting_states = accepting_states
         self.current_state = 0
         self.current_token = ''
+        self.tokenTable = [['','']]  # define tokenTable attribute here
+
+    def currentToken(self, token, state, tokenTable):
+        if state == 58:
+            tokenTable.append(['VariableDecl', 'LET'])
+            return tokenTable
+
+        if state == 60:
+            #print(tokenTable[-1][0])
+            if tokenTable[-1][0] == 'Variable':
+                tokenTable[-1][1] += token
+                return tokenTable
+            else:
+                tokenTable.append(['Variable', token])
+                return tokenTable
+
+        if state == 1 or state == 102:
+            if tokenTable[-1][0] == 'ExpVariable':
+                tokenTable[-1][1] += token
+                return tokenTable
+            else:
+                tokenTable.append(['ExpVariable', token])
+                return tokenTable
+
+        if state == 37:
+            if tokenTable[-1][0] == 'Integer':
+                tokenTable[-1][1] += token
+                return tokenTable
+            else:
+                tokenTable.append(['Integer', token])
+                return tokenTable
+
+        if state == 2 or state == 8 or state == 4 or state == 5 or state == 6 or state == 7:
+            if tokenTable[-1][0] == 'BinaryOp':
+                tokenTable[-1][1] += token
+                return tokenTable
+            else:
+                tokenTable.append(['BinaryOp', token])
+                return tokenTable
+
+
+
+        if state == 39 or state == 40 or state == 41 or state == 42 or state == 43 or state == 44 or state == 45:
+            if tokenTable[-1][0] == 'ColourLiteral':
+                tokenTable[-1][1] += token
+                return tokenTable
+            else:
+                tokenTable.append(['ColourLiteral', token])
+                return tokenTable
+
+        if state == 19:
+            tokenTable.append(['PadWidth', '__width'])
+            return tokenTable
+
+        if state == 25:
+            tokenTable.append(['PadHeight', '__height'])
+            return tokenTable
+
+        if state == 49:
+            tokenTable.append(['BooleanLiteral', 'True'])
+            return tokenTable
+
+        if state == 54:
+            tokenTable.append(['BooleanLiteral', 'False'])
+            return tokenTable
+
+        if state == 30:
+            tokenTable.append(['PadRandI', '__randi'])
+            return tokenTable
+
+        if state == 140:
+            tokenTable.append(['PadRead', '__read'])
+            return tokenTable
+
+        if state == 138:
+            tokenTable.append(['Comma', ' , '])
+            return tokenTable
+
+        if token == '(':
+            tokenTable.append(['OpenPar', ' ( '])
+            return tokenTable
+
+        if token == ')':
+            tokenTable.append(['ClosePar', ' ) '])
+            return tokenTable
+
+        if token == '{':
+            tokenTable.append(['OpenBlock', ' { '])
+            return tokenTable
+
+        if token == '}':
+            tokenTable.append(['CloseBlock', ' } '])
+            return tokenTable
+
+        if state == 12:
+            tokenTable.append(['Unary', 'Not'])
+            return tokenTable
+
+        if state == 11:
+            tokenTable.append(['Unary', token])
+            return tokenTable
+
+        if state == 87:
+            tokenTable.append(['PrintStat', '__print'])
+            return tokenTable
+
+        if state == 92:
+            tokenTable.append(['DelayStat', '__delay'])
+            return tokenTable
+
+        if state == 97:
+            tokenTable.append(['ReturnStat', 'return'])
+            return tokenTable
+
+        if state == 136:
+            tokenTable.append(['PixelStat', '__pixel'])
+            return tokenTable
+
+        if state == 137 :
+            if tokenTable[-1][0] == 'PixelStat':
+                tokenTable[-1][1] += token
+                return tokenTable
+            else:
+                tokenTable.append(['PixelStat', token])
+                return tokenTable
+
+        if state == 125:
+            tokenTable.append(['IfStat', ' IF'])
+            return tokenTable
+
+        if state == 132:
+            tokenTable.append(['ElseStat', ' ELSE '])
+            return tokenTable
+
+        if state == 111:
+            tokenTable.append(['ForStat', ' FOR '])
+            return tokenTable
+
+        if state == 121:
+            tokenTable.append(['WhileStat', ' While '])
+            return tokenTable
+
+        if token == ';':
+            tokenTable.append(['SemiCol', ' ; '])
+            return tokenTable
+
+        if token == ',':
+            tokenTable.append(['Colon', ' , '])
+            return tokenTable
+
+        if state == 100:
+            tokenTable.append(['FunctionDecl', ' FUN '])
+            return tokenTable
+
+        if state == 68:
+            tokenTable.append(['Type', ' FLOAT '])
+            return tokenTable
+
+        if state == 71:
+            tokenTable.append(['Type', ' INT '])
+            return tokenTable
+
+        if state == 74:
+            tokenTable.append(['Type', ' BOOL '])
+            return tokenTable
+
+        if state == 79:
+            tokenTable.append(['Type', ' COLOUR '])
+            return tokenTable
+        return tokenTable
 
     def get_next_token(self, input_string):
         self.current_state = 0
         self.current_token = ''
+        self.table = []
         for char in input_string:
             try:
                 self.current_state = self.transition_table[(self.current_state, char)]
                 self.current_token += char
+                self.table.append((char, self.current_state))
+
                 print(f"Current token: {self.current_token}, current state: {self.current_state}")
+
+                self.tokenTable = self.currentToken(char, self.current_state, self.tokenTable)  # pass tokenTable as argument
+
+
             except KeyError:
-                return False, self.current_token, self.current_state
+                return False, self.current_token, self.current_state, self.table
+
+        print(self.tokenTable)
+
         if self.current_state in self.accepting_states:
-            return True, self.current_token, self.current_state
+            return True, self.current_token, self.current_state, self.table
         else:
-            return False, self.current_token, self.current_state
+            return False, self.current_token, self.current_state, self.table
+
+class ASTNode:
+    def __init__(self, value: str, children: List = []):
+        self.value = value
+        self.children = children
+
+    def __str__(self):
+        return f"{self.value}: {self.children}"
+
+
+class Parser:
+    def __init__(self, lexer, input):
+        self.lexer = lexer
+        self.current_token = None
+        self.current_state = None
+        self.input = input
+        self.table = []
+
+    def parse(self):
+        valid_syntax, self.current_token, self.current_state, self.table = self.lexer.get_next_token(self.input)
+        node = ''
+        for i in range(2):
+            node = self.program()
+            print(node)
+
+
+    def program(self):
+        print(self.table)
+        for i in self.table:
+            #print(i)
+            if i[1] == 59:
+
+                index_59 = self.table.index(i)  # Get the index of the element with value 58
+                del self.table[:index_59 + 1]  # Delete every element after the element with value 58
+                return ('ASTVarDecl')
+
+
+            if i[1] == 61:
+                identifier = []
+                identifierLoc = self.table.index(i)
+                for x in range(identifierLoc):
+                    identifier.append(self.table[x][0])
+                j = ''
+                node = 'ASTIdentifier: ', j.join(identifier)
+                index = self.table.index(i)  # Get the index of the element with value 58
+                del self.table[:index + 1]  # Delete every element after the element with value 58
+                return(node)
+
 
 
 
@@ -212,6 +454,7 @@ transition_table[(12, ' ')] = 55
 transition_table[(19, ' ')] = 3
 transition_table[(25, ' ')] = 3
 transition_table[(30, ' ')] = 55
+transition_table[(140, ' ')] = 55
 transition_table[(34, ' ')] = 55
 transition_table[(35, ' ')] = 55
 transition_table[(37, ' ')] = 3
@@ -304,7 +547,7 @@ transition_table[(29, 'i')] = 30
 #〈PadRead〉 :: = ‘__read’ 〈Expr 〉‘,’〈Expr 〉
 transition_table[(26, 'e')] = 32
 transition_table[(32, 'a')] = 33
-transition_table[(33, 'd')] = 30
+transition_table[(33, 'd')] = 140
 transition_table[(3, ',')] = 34
 
 #〈FunctionCall〉 ::= 〈Identifier 〉 ‘(’ [ 〈ActualParams〉 ] ‘)’
@@ -493,23 +736,23 @@ transition_table[(31, '}')] = 203
 
 accepting_states = {31, 203, 201}
 
-# lexer = Lexer(transition_table, accepting_states)
-# input_string = input("Enter a string to lex: ")
-# valid_syntax, current_token, current_state = lexer.get_next_token(input_string)
-# if valid_syntax:
-#     print(f"Valid syntax! Current token: {current_token}, current state: {current_state}")
-# else:
-#     print(f"Invalid syntax! Current token: {current_token}, current state: {current_state}")
-
 
 lexer = Lexer(transition_table, accepting_states)
 filename = 'input.txt'
+
 with open(filename, 'r') as file:
     for line in file:
         line = line.strip()
         if line:
-            valid_syntax, current_token, current_state = lexer.get_next_token(line)
+            valid_syntax, current_token, current_state, table = lexer.get_next_token(line)
             if valid_syntax:
                 print(f"Valid syntax! Current token: {current_token}, current state: {current_state}")
+                #parser = Parser(lexer)
+                #ast = parser.parse(line)
+                #print(ast)
             else:
                 print(f"Invalid syntax! Current token: {current_token}, current state: {current_state}")
+
+
+
+#print(tokensTable)
