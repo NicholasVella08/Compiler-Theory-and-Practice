@@ -1,0 +1,315 @@
+<Function_Decl>
+  <Function name>
+    Race
+    </Function name>
+  <params>
+    ('p1_c', ' COLOUR ')
+    ('p2_c', ' COLOUR ')
+    ('score_max', ' INT ')
+    </params>
+  <Return type>
+     INT 
+    </Return type>
+  </Function_Decl>
+<Block>
+  <Block>
+     { } 
+    </Block>
+  <Statement>
+    <Variable_Decl>
+      <name>
+        p1_score
+        </name>
+      <type>
+         INT 
+        </type>
+      <expr>
+        <Expression Op>
+          +
+          </Expression Op>
+        <Left Side>
+          <Expression Op>
+            *
+            </Expression Op>
+          <Left Side>
+            <Integer>
+              1
+              </Integer>
+            </Left Side>
+          <Right Side>
+            <ExpVariable>
+              a
+              </ExpVariable>
+            </Right Side>
+          </Left Side>
+        <Right Side>
+          <PadWidth>
+            __width
+            </PadWidth>
+          </Right Side>
+        </expr>
+      </Variable_Decl>
+    <Variable_Decl>
+      <name>
+        p2_score
+        </name>
+      <type>
+         INT 
+        </type>
+      <expr>
+        <Integer>
+          0
+          </Integer>
+        </expr>
+      </Variable_Decl>
+    <While Stat>
+      <Expression>
+        <Expression Op>
+          and
+          </Expression Op>
+        <Left Side>
+          <SubExpr>
+            ( )
+            </SubExpr>
+          <Expression>
+            <Expression Op>
+              <
+              </Expression Op>
+            <Left Side>
+              <ExpVariable>
+                p1_score
+                </ExpVariable>
+              </Left Side>
+            <Right Side>
+              <ExpVariable>
+                score_max
+                </ExpVariable>
+              </Right Side>
+            </Expression>
+          </Left Side>
+        <Right Side>
+          <SubExpr>
+            ( )
+            </SubExpr>
+          <Expression>
+            <Expression Op>
+              <
+              </Expression Op>
+            <Left Side>
+              <ExpVariable>
+                p2_score
+                </ExpVariable>
+              </Left Side>
+            <Right Side>
+              <ExpVariable>
+                score_max
+                </ExpVariable>
+              </Right Side>
+            </Expression>
+          </Right Side>
+        </Expression>
+      <Block>
+        <Block>
+           { } 
+          </Block>
+        <Statement>
+          <Block>
+            <Statement>
+              <Variable_Decl>
+                <name>
+                  p1_toss
+                  </name>
+                <type>
+                   INT 
+                  </type>
+                <expr>
+                  <PadRandI>
+                    __randi
+                    </PadRandI>
+                  <Expression>
+                    <Integer>
+                      1000
+                      </Integer>
+                    </Expression>
+                  </expr>
+                </Variable_Decl>
+              <Variable_Decl>
+                <name>
+                  p2_toss
+                  </name>
+                <type>
+                   INT 
+                  </type>
+                <expr>
+                  <PadRandI>
+                    __randi
+                    </PadRandI>
+                  <Expression>
+                    <Integer>
+                      1000
+                      </Integer>
+                    </Expression>
+                  </expr>
+                </Variable_Decl>
+              <IF_Stat>
+                <Expression>
+                  <Expression Op>
+                    >
+                    </Expression Op>
+                  <Left Side>
+                    <ExpVariable>
+                      p1_toss
+                      </ExpVariable>
+                    </Left Side>
+                  <Right Side>
+                    <ExpVariable>
+                      p2_toss
+                      </ExpVariable>
+                    </Right Side>
+                  </Expression>
+                <Block>
+                  <Block>
+                    <Statement>
+                      <Variable>
+                        <Name>
+                          p1_score
+                          </Name>
+                        <Expression>
+                          <Expression Op>
+                            +
+                            </Expression Op>
+                          <Left Side>
+                            <ExpVariable>
+                              p1_score
+                              </ExpVariable>
+                            </Left Side>
+                          <Right Side>
+                            <Integer>
+                              1
+                              </Integer>
+                            </Right Side>
+                          </Expression>
+                        </Variable>
+                      </Statement>
+                    </Block>
+                  </Block>
+                <ELSE_Stat>
+                  <Block>
+                    <Statement>
+                      <Variable>
+                        <Name>
+                          p2_score
+                          </Name>
+                        <Expression>
+                          <Expression Op>
+                            +
+                            </Expression Op>
+                          <Left Side>
+                            <ExpVariable>
+                              p2_score
+                              </ExpVariable>
+                            </Left Side>
+                          <Right Side>
+                            <Integer>
+                              1
+                              </Integer>
+                            </Right Side>
+                          </Expression>
+                        </Variable>
+                      </Statement>
+                    </Block>
+                  </ELSE_Stat>
+                </IF_Stat>
+              <DelayStat>
+                <Expression>
+                  <Expression Op>
+                    +
+                    </Expression Op>
+                  <Left Side>
+                    <ExpVariable>
+                      p1_toss
+                      </ExpVariable>
+                    </Left Side>
+                  <Right Side>
+                    <Integer>
+                      2
+                      </Integer>
+                    </Right Side>
+                  </Expression>
+                </DelayStat>
+              <Pixel_Statment>
+                <Type:>
+                  __pixel
+                  </Type:>
+                <Expressions>
+                  <Integer>
+                    2
+                    </Integer>
+                  <ExpVariable>
+                    p2_score
+                    </ExpVariable>
+                  <ExpVariable>
+                    p2_c
+                    </ExpVariable>
+                  </Expressions>
+                </Pixel_Statment>
+              </Statement>
+            </Block>
+          <Variable_Decl>
+            <name>
+              winner
+              </name>
+            <type>
+               INT 
+              </type>
+            <expr>
+              <Integer>
+                1
+                </Integer>
+              </expr>
+            </Variable_Decl>
+          <IF_Stat>
+            <Expression>
+              <Expression Op>
+                >
+                </Expression Op>
+              <Left Side>
+                <ExpVariable>
+                  p2_score
+                  </ExpVariable>
+                </Left Side>
+              <Right Side>
+                <ExpVariable>
+                  p1_score
+                  </ExpVariable>
+                </Right Side>
+              </Expression>
+            <Block>
+              <Block>
+                <Statement>
+                  <Variable>
+                    <Name>
+                      inner
+                      </Name>
+                    <Expression>
+                      <Integer>
+                        2
+                        </Integer>
+                      </Expression>
+                    </Variable>
+                  </Statement>
+                </Block>
+              </Block>
+            </IF_Stat>
+          <ReturnStat>
+            <Expression>
+              <ExpVariable>
+                winner
+                </ExpVariable>
+              </Expression>
+            </ReturnStat>
+          </Statement>
+        </Block>
+      </While Stat>
+    </Statement>
+  </Block>

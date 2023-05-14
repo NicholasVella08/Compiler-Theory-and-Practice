@@ -29,19 +29,7 @@ class Token:
 # #         else:
 # #             return False, self.current_token, self.current_state
 #
-class TokenType:
-    INT = 'INT'
-    PLUS = 'PLUS'
-    MINUS = 'MINUS'
-    MUL = 'MUL'
-    DIV = 'DIV'
-    LPAREN = 'LPAREN'
-    RPAREN = 'RPAREN'
-    EOF = 'EOF'
-    LET = 'LET'
-    VAR = 'VAR'
-    ASSIGN = 'ASSIGN'
-    SEMI = 'SEMI'
+
 tokensTable = []
 class Lexer:
     def __init__(self, transition_table, accepting_states):
@@ -196,7 +184,7 @@ class Lexer:
             return tokenTable
 
         if token == ',':
-            tokenTable.append(['Colon', ' , '])
+            tokenTable.append(['Comma', ' , '])
             return tokenTable
 
         if state == 100:
@@ -230,7 +218,7 @@ class Lexer:
                 self.current_token += char
                 self.table.append((char, self.current_state))
 
-                print(f"Current token: {self.current_token}, current state: {self.current_state}")
+                #print(f"Current token: {self.current_token}, current state: {self.current_state}")
 
                 self.tokenTable = self.currentToken(char, self.current_state, self.tokenTable)  # pass tokenTable as argument
 
@@ -238,12 +226,16 @@ class Lexer:
             except KeyError:
                 return False, self.current_token, self.current_state, self.table
 
-        print(self.tokenTable)
+        #print(self.tokenTable)
 
         if self.current_state in self.accepting_states:
-            return True, self.current_token, self.current_state, self.table
+            print(f"Valid syntax! Current token: {input_string}, current state: {self.current_state}")
+
+
+            return self.tokenTable
         else:
-            return False, self.current_token, self.current_state, self.table
+            print(f"Invalid syntax! Current token: {input_string}, current state: {self.current_state}")
+            #return False, self.current_token, self.current_state, self.table
 
 class ASTNode:
     def __init__(self, value: str, children: List = []):
@@ -254,43 +246,587 @@ class ASTNode:
         return f"{self.value}: {self.children}"
 
 
+
+
+
 class Parser:
-    def __init__(self, lexer, input):
+    #def __init__(self, lexer, input_string):
+    def __init__(self, tokenTable):
         self.lexer = lexer
-        self.current_token = None
-        self.current_state = None
-        self.input = input
-        self.table = []
+        #self.tokenTable = self.lexer.get_next_token(input_string)
+        self.tokenTable = tokenTable
+        self.current_token_index = 1
+        #print('---------------')
+        print(self.tokenTable)
+        #print(parse_function_decl())
 
-    def parse(self):
-        valid_syntax, self.current_token, self.current_state, self.table = self.lexer.get_next_token(self.input)
-        node = ''
-        for i in range(2):
-            node = self.program()
-            print(node)
+    def error(self, message):
+        raise Exception(message)
+
+    def parse_selector(self):
+        if self.tokenTable[self.current_token_index][0] == 'FunctionDecl':
+            return (self.parse_function_decl())
+
+        if self.tokenTable[self.current_token_index][0] == 'VariableDecl':
+            return(self.parse_variable_decl())
+
+        if self.tokenTable[self.current_token_index][0] == 'Variable':
+            return(self.parse_variable())
+
+        if self.tokenTable[self.current_token_index][0] == 'PrintStat':
+            return(self.parse_print())
+
+        if self.tokenTable[self.current_token_index][0] == 'DelayStat':
+            return(self.parse_delay())
+
+        if self.tokenTable[self.current_token_index][0] == 'ReturnStat':
+            return(self.parse_return())
+
+        if self.tokenTable[self.current_token_index][0] == 'PixelStat':
+            return(self.parse_pixel())
+
+        if self.tokenTable[self.current_token_index][0] == 'OpenBlock':
+            return(self.parse_block())
+
+        if self.tokenTable[self.current_token_index][0] == 'WhileStat':
+            return(self.parse_while())
+
+        if self.tokenTable[self.current_token_index][0] == 'IfStat':
+            return(self.parse_ifElse())
 
 
-    def program(self):
-        print(self.table)
-        for i in self.table:
-            #print(i)
-            if i[1] == 59:
+        if self.tokenTable[self.current_token_index][0] == 'ForStat':
+            return (self.parse_for())
 
-                index_59 = self.table.index(i)  # Get the index of the element with value 58
-                del self.table[:index_59 + 1]  # Delete every element after the element with value 58
-                return ('ASTVarDecl')
+        return {'No choice'}
 
 
-            if i[1] == 61:
-                identifier = []
-                identifierLoc = self.table.index(i)
-                for x in range(identifierLoc):
-                    identifier.append(self.table[x][0])
-                j = ''
-                node = 'ASTIdentifier: ', j.join(identifier)
-                index = self.table.index(i)  # Get the index of the element with value 58
-                del self.table[:index + 1]  # Delete every element after the element with value 58
-                return(node)
+
+    def get_current_token(self):
+        return self.tokenTable[self.current_token_index]
+
+    def parse_function_decl(self):
+        # Expect the next token to be FunctionDecl
+
+        if self.tokenTable[self.current_token_index][0] != 'FunctionDecl':
+            self.error('Expected FunctionDecl')
+        self.current_token_index += 1
+
+        # Expect the next token to be the function name
+        if self.tokenTable[self.current_token_index][0] != 'ExpVariable':
+            self.error('Expected function name')
+        func_name = self.tokenTable[self.current_token_index][1]
+        self.current_token_index += 1
+
+        # Expect the next token to be OpenPar
+        if self.tokenTable[self.current_token_index][0] != 'OpenPar':
+            self.error('Expected (')
+        self.current_token_index += 1
+
+        # Parse the function parameters
+        params = []
+        while True:
+            if self.tokenTable[self.current_token_index][0] == 'ClosePar':
+                break
+
+            if self.tokenTable[self.current_token_index][0] != 'Variable':
+                self.error('Expected variable name')
+
+            param_name = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            if self.tokenTable[self.current_token_index][0] != 'Type':
+                self.error('Expected parameter type')
+
+            param_type = self.tokenTable[self.current_token_index][1]
+            params.append((param_name, param_type))
+            self.current_token_index += 1
+            if self.tokenTable[self.current_token_index][0] != 'Comma' and self.tokenTable[self.current_token_index][
+                0] != 'ClosePar':
+                self.error('Expected , or )')
+
+            if self.tokenTable[self.current_token_index][0] == 'Comma':
+                self.current_token_index += 1
+
+
+        self.current_token_index += 1
+        return_type = self.tokenTable[self.current_token_index][1]
+        if self.tokenTable[self.current_token_index][0] != 'Type':
+            self.error('Expected parameter type')
+
+        #self.current_token_index += 1
+        # Expect the next token to be OpenBrace
+        # if self.tokenTable[self.current_token_index][0] != 'OpenBlock':
+        #     self.error('Expected {')
+
+        self.current_token_index += 1
+        block = self.parse_block()
+
+        #print('func decl', self.tokenTable[self.current_token_index][0])
+        # Construct and return the FunctionDecl AST node
+
+        info = {'Function name': func_name, 'params': params, 'Return type': return_type}
+        return {'Function_Decl': info, 'Block': block}
+
+    def parse_variable_decl(self):
+        # Expect the next token to be VariableDecl
+        if self.tokenTable[self.current_token_index][0] != 'VariableDecl':
+            self.error('Expected VariableDecl')
+        self.current_token_index += 1
+
+        # Expect the next token to be Variable
+        if self.tokenTable[self.current_token_index][0] != 'Variable':
+            self.error('Expected variable name')
+        var_name = self.tokenTable[self.current_token_index][1]
+        self.current_token_index += 1
+
+
+        # Expect the next token to be Type
+        if self.tokenTable[self.current_token_index][0] != 'Type':
+            self.error('Expected type')
+        var_type = self.tokenTable[self.current_token_index][1]
+        self.current_token_index += 1
+
+        # Parse the expression
+        expr = self.parse_expr()
+
+        #self.current_token_index += 1
+        # Expect the next token to be SemiColon
+        if self.tokenTable[self.current_token_index][0] != 'SemiCol':
+            self.error('Expected ;')
+        self.current_token_index += 1
+
+        #print('varibake decl', self.tokenTable[self.current_token_index][0])
+        # Construct and return the VariableDecl AST node
+
+        info ={'name': var_name, 'type': var_type, 'expr': expr}
+        return {'Variable_Decl': info}
+
+    def parse_expr(self):
+
+        left = self.parse_simple_expr()
+
+        #self.current_token_index += 1
+
+        if self.tokenTable[self.current_token_index][1] == '<' or \
+                self.tokenTable[self.current_token_index][1] == '>' or \
+                self.tokenTable[self.current_token_index][1] == '==' or \
+                self.tokenTable[self.current_token_index][1] == '!=' or \
+                self.tokenTable[self.current_token_index][1] == '<=' or \
+                self.tokenTable[self.current_token_index][1] == '>=':
+
+
+
+            op = self.tokenTable[self.current_token_index][1]
+
+            self.current_token_index += 1
+            right = self.parse_simple_expr()
+
+            print('expr', self.tokenTable[self.current_token_index][0])
+            return {'Expression Op': op, 'Left Side': left, 'Right Side': right}
+
+        else:
+            print('expr', self.tokenTable[self.current_token_index][0])
+            return left
+
+    def parse_simple_expr(self):
+
+        left = self.parse_term()
+        #self.current_token_index += 1
+
+        if self.tokenTable[self.current_token_index][1] == '+' or\
+                self.tokenTable[self.current_token_index][1] == '-' or \
+                self.tokenTable[self.current_token_index][1] == 'or':
+
+            op = self.tokenTable[self.current_token_index][1]
+
+            self.current_token_index += 1
+            right = self.parse_term()
+            #self.current_token_index += 1
+            print('simple expr', self.tokenTable[self.current_token_index][0])
+            return {'Expression Op': op, 'Left Side': left, 'Right Side': right}
+
+        else:
+            print('simple expr', self.tokenTable[self.current_token_index][0])
+            return left
+
+    def parse_term(self):
+
+        left = self.parse_factor()
+
+        #self.current_token_index += 1
+
+        if self.tokenTable[self.current_token_index][1] == '*' or \
+                self.tokenTable[self.current_token_index][1] == '/' or \
+                self.tokenTable[self.current_token_index][1] == 'and':
+            op = self.tokenTable[self.current_token_index][1]
+
+            self.current_token_index += 1
+            right = self.parse_factor()
+            #self.current_token_index += 1
+            print('term', self.tokenTable[self.current_token_index][0])
+            return {'Expression Op': op, 'Left Side': left, 'Right Side': right}
+
+        else:
+            print('term', self.tokenTable[self.current_token_index][0])
+            return left
+
+    def parse_factor(self):
+        expTable = []
+        #print(self.tokenTable[self.current_token_index][0])
+
+        if self.tokenTable[self.current_token_index][0] == 'ExpVariable':
+            var_name = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+
+            if self.tokenTable[self.current_token_index][0] == 'OpenPar':
+                #function call
+                self.current_token_index += 1
+                exp = self.parse_expr()
+                expTable.append(exp)
+                while(self.tokenTable[self.current_token_index][0] == 'Comma'):
+                    self.current_token_index += 1
+                    exp = self.parse_expr()
+                    expTable.append(exp)
+
+                self.current_token_index += 1
+                print('factor', self.tokenTable[self.current_token_index][0])
+                return{'FunctionName': var_name, 'Parameters': expTable}
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'ExpVariable': var_name}
+
+        if self.tokenTable[self.current_token_index][0] == 'Integer':
+            token = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'Integer': token}
+
+        if self.tokenTable[self.current_token_index][0] == 'BooleanLiteral':
+            token = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'BooleanLiteral': token}
+
+        if self.tokenTable[self.current_token_index][0] == 'ColourLiteral':
+            var_name = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'ColourLiteral': var_name}
+
+        if self.tokenTable[self.current_token_index][0] == 'PadWidth':
+            token = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'PadWidth': token}
+
+        if self.tokenTable[self.current_token_index][0] == 'PadHeight':
+            token = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'PadHeight': token}
+
+        #PadRead
+        if self.tokenTable[self.current_token_index][0] == 'PadRead':
+            token = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            firstEx = self.parse_expr()
+
+            if self.tokenTable[self.current_token_index][0] != 'Comma':
+                self.error('Expected ,')
+            self.current_token_index += 1
+
+            secondEx = self.parse_expr()
+
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'PadRead': token, 'First expression': firstEx, 'Second Expression': secondEx}
+
+        if self.tokenTable[self.current_token_index][0] == 'PadRandI':
+            token = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            firstEx = self.parse_expr()
+
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'PadRandI': token, 'Expression': firstEx}
+
+        if self.tokenTable[self.current_token_index][0] == 'Unary':
+            token = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            firstEx = self.parse_expr()
+
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'Unary': token, 'Expression': firstEx}
+
+        if self.tokenTable[self.current_token_index][0] == 'OpenPar':
+            #token = self.tokenTable[self.current_token_index][1]
+            self.current_token_index += 1
+            exp = self.parse_expr()
+
+            if self.tokenTable[self.current_token_index][0] != 'ClosePar':
+                self.error('Expected )')
+            self.current_token_index += 1
+
+            print('factor', self.tokenTable[self.current_token_index][0])
+            return {'SubExpr': '( )', 'Expression': exp}
+
+        self.error('Expected a Valid Expression')
+
+    def parse_variable(self):
+        var_name = self.tokenTable[self.current_token_index][1]
+        self.current_token_index += 1
+
+        if(self.tokenTable[self.current_token_index][1]  == '='):
+            self.current_token_index += 1
+        print('variable', self.tokenTable[self.current_token_index-2][1])
+        # Parse the expression
+        expr = self.parse_expr()
+        self.current_token_index += 1
+        print('variable', self.tokenTable[self.current_token_index][0])
+        info = {'Name': var_name, 'Expression': expr}
+        return {'Variable': info}
+
+    def parse_print(self):
+        self.current_token_index += 1
+
+        # Parse the expression
+        expr = self.parse_expr()
+        print('print', self.tokenTable[self.current_token_index][0])
+        self.current_token_index += 1
+        info = {'Expression': expr}
+        return {'PrintStat': info, }
+
+    def parse_delay(self):
+        self.current_token_index += 1
+
+        # Parse the expression
+        expr = self.parse_expr()
+        print('delay', self.tokenTable[self.current_token_index][0])
+        self.current_token_index += 1
+        info = {'Expression': expr}
+        return {'DelayStat': info}
+
+    def parse_return(self):
+        self.current_token_index += 1
+
+        # Parse the expression
+        expr = self.parse_expr()
+        print('return', self.tokenTable[self.current_token_index][0])
+        self.current_token_index += 1
+        print('return', self.tokenTable[self.current_token_index][0])
+        info = {'Expression': expr}
+        return {'ReturnStat': info}
+
+    def parse_pixel(self):
+        expTable = []
+        token = self.tokenTable[self.current_token_index][1]
+        self.current_token_index += 1
+
+        if token == '__pixelr':
+            expr = self.parse_expr()
+            expTable.append(expr)
+            for i in range(4):
+                if self.tokenTable[self.current_token_index][0] != 'Comma':
+                    self.error('Expected a Valid Expression')
+                self.current_token_index += 1
+                expr = self.parse_expr()
+                expTable.append(expr)
+
+
+        if token == '__pixel':
+            expr = self.parse_expr()
+            expTable.append(expr)
+            for i in range(2):
+                if self.tokenTable[self.current_token_index][0] != 'Comma':
+                    self.error('Expected a Valid Expression')
+                self.current_token_index += 1
+                expr = self.parse_expr()
+                expTable.append(expr)
+
+        if self.tokenTable[self.current_token_index][0] != 'SemiCol':
+            self.error('Invalid Number Of Expressions')
+        print('Pixel', self.tokenTable[self.current_token_index][0])
+        self.current_token_index += 1
+        info= {'Type:': token, 'Expressions': expTable}
+        return {'Pixel_Statment': info }
+
+
+    def parse_block(self):
+        print('BLOCK *-*-*-*--*-*-* BLOCK')
+        self.current_token_index += 1
+        statTable = []
+
+
+        while(True):
+            print('*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-')
+            print(self.tokenTable[self.current_token_index][0])
+            print('*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-')
+            #print(len(self.tokenTable))
+
+            statement = self.parse_selector()
+            print(self.tokenTable[self.current_token_index][0])
+            print(self.current_token_index)
+            statTable.append(statement)
+            #print(statTable)
+
+
+
+            #and self.current_token_index == len(self.tokenTable)
+            if (self.tokenTable[self.current_token_index][0] == 'CloseBlock'):
+                if (self.current_token_index == len(self.tokenTable) - 1):
+                    return {'Block': ' { } ', 'Statement': statTable}
+                break
+
+
+
+
+
+        self.current_token_index += 1
+        info = {'Statement': statTable}
+
+        return {'Block': info }
+
+    def parse_while(self):
+        self.current_token_index += 1
+
+        # Parse the expression
+        if self.tokenTable[self.current_token_index][0] != 'OpenPar':
+            self.error('Invalid While loop')
+
+        self.current_token_index += 1
+        expr = self.parse_expr()
+
+        if self.tokenTable[self.current_token_index][0] != 'ClosePar':
+            self.error('Invalid While loop')
+
+        #self.current_token_index += 1
+        print('->->->_')
+        block = self.parse_block()
+
+
+
+        #self.current_token_index += 1
+        #self.current_token_index += 1
+
+        #print('While', self.tokenTable[self.current_token_index][0])
+        info =  {'Expression': expr, 'Block': block}
+        return {'While Stat': info}
+
+    def parse_ifElse(self):
+        self.current_token_index += 1
+
+        # Parse the expression
+        if self.tokenTable[self.current_token_index][0] != 'OpenPar':
+            self.error('Invalid While loop')
+
+        self.current_token_index += 1
+        expr = self.parse_expr()
+
+        if self.tokenTable[self.current_token_index][0] != 'ClosePar':
+            self.error('Invalid While loop')
+
+        self.current_token_index += 1
+        block = self.parse_block()
+        #self.current_token_index += 1
+
+
+        if self.tokenTable[self.current_token_index][0] == 'ElseStat':
+            #self.current_token_index += 1
+            print('IFELSE', self.tokenTable[self.current_token_index][0])
+            eBlock = self.parse_block()
+            print('IF+*ELSE', self.tokenTable[self.current_token_index][0])
+            #self.current_token_index += 1
+            #eInfo = {eBlock}
+            info = {'Expression': expr, 'Block': block, 'ELSE_Stat': eBlock}
+            return {'IF_Stat': info}
+        else:
+            print('IF', self.tokenTable[self.current_token_index][0])
+            #self.current_token_index += 1
+            info = {'Expression': expr, 'Block': block}
+            return {'IF_Stat': info}
+
+    def parse_for(self):
+        self.current_token_index += 1
+
+        # Parse the expression
+        if self.tokenTable[self.current_token_index][0] != 'OpenPar':
+            self.error('Invalid For loop')
+
+        self.current_token_index += 1
+        varDecl = ''
+
+        if self.tokenTable[self.current_token_index][0] == 'VariableDecl':
+            varDecl = self.parse_variable_decl()
+
+        self.current_token_index -= 1
+
+
+        if self.tokenTable[self.current_token_index][0] != 'SemiCol':
+            self.error('Invalid For loop')
+
+        self.current_token_index += 1
+        expr = self.parse_expr()
+
+        if self.tokenTable[self.current_token_index][0] != 'SemiCol':
+            self.error('Invalid For loop')
+
+        self.current_token_index += 1
+        assignment = ''
+        if self.tokenTable[self.current_token_index][0] == 'ExpVariable':
+            assignment = self.parse_variable()
+
+        #self.current_token_index += 1
+
+        if self.tokenTable[self.current_token_index][0] != 'ClosePar':
+            self.error('Invalid While loop')
+
+        self.current_token_index += 1
+        block = self.parse_block()
+        print('for', self.tokenTable[self.current_token_index][0])
+        info = {'Variable Decl' : varDecl, 'Expression': expr, 'Assignment': assignment, 'Block': block}
+        return {'For Stat': info}
+
+
+
+class XmlVisitor:
+    def __init__(self, asl_dict):
+        self.xml = ''
+        self.indentation = 0
+        self.asl_dict = asl_dict
+
+    def visit(self, node):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                print(key)
+                print(value)
+                self.indent()
+                self.xml += f"<{key}>"
+                self.indentation += 1
+                self.xml += '\n'
+                self.visit(value)
+                self.indent()
+                self.xml += f"</{key}>"
+                self.xml += '\n'
+                self.indentation -= 1
+        elif isinstance(node, list):
+            for item in node:
+                self.visit(item)
+        else:
+            self.indent()
+            self.xml += str(node)
+            self.xml += '\n'
+
+    def indent(self):
+        self.xml += '  ' * self.indentation
+
+    def write_to_file(self, file_path):
+        with open(file_path, 'w') as f:
+            f.write(self.xml)
+
+    def generate_xml(self):
+        self.visit(self.asl_dict)
+        return self.xml
+
+
+
+
 
 
 
@@ -739,20 +1275,24 @@ accepting_states = {31, 203, 201}
 
 lexer = Lexer(transition_table, accepting_states)
 filename = 'input.txt'
-
+code = ''
 with open(filename, 'r') as file:
     for line in file:
         line = line.strip()
         if line:
-            valid_syntax, current_token, current_state, table = lexer.get_next_token(line)
-            if valid_syntax:
-                print(f"Valid syntax! Current token: {current_token}, current state: {current_state}")
-                #parser = Parser(lexer)
-                #ast = parser.parse(line)
-                #print(ast)
-            else:
-                print(f"Invalid syntax! Current token: {current_token}, current state: {current_state}")
+            #valid_syntax, current_token, current_state, table = lexer.get_next_token(line)
+            tokenTable = lexer.get_next_token(line)
+            #code = code + line + ' '
+
+
+#print(line)
+parser = Parser(tokenTable)
+ast = parser.parse_selector()
+
+visitor = XmlVisitor(ast)
+visitor.generate_xml()
+visitor.write_to_file('output.xml')
 
 
 
-#print(tokensTable)
+print(ast)#print(xml)
