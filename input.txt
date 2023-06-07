@@ -1,21 +1,45 @@
 fun Race( p1_c : colour , p2_c : colour , score_max : int ) -> int {
+	let a : int = 0 ;
 	let p1_score : int = 1 * a + __width;
-	let p2_score : int = 0 ;
+	return a;
+}
 
-	while ( ( p1_score < score_max ) and ( p2_score < score_max ) ){
-		let p1_toss : int = __randi 1000 ;	
-		let p2_toss : int = __randi 1000 ;
-		if ( p1_toss > p2_toss ){
-			p1_score = p1_score + 1 ;
-		} else{
-			p2_score = p2_score + 1 ;
+let p1_toss : int = __randi 1000 ;
+
+let p2_toss : bool = true;
+
+if ( p1_toss > p2_toss ){
+	let p1_score : int = 0 ;
+	let p2_score : int = 0 ;
+	p1_score = p1_score + 0 ;
+}
+
+
+fun Tace( p1_c : colour , p2_c : colour , score_max : int ) -> int {
+	let p3_toss : int = __randi 1000 ;
+	
+	if ( p1_toss > p2_toss ){
+		p1_score = p1_score + 1 ;
+	} else{
+		let p9_toss : int = __randi 1000 ;
+		p1_score = p1_score + __randi 1000 ;
+		__print p1_score ;
 		}
-		__delay p1_toss + 2 ;
+	for ( let p0_toss : int = 0 ; p1_score + 1 ; p1_score = 20 ){
+
+		let pp1_score : int = __randi 1000 ;	
+		let p6_toss : int = __randi 1000 ;
+		
+		__delay p3_toss + 2 ;
+		__pixelr pp1_score , p6_toss , 1 , 0 , #00ff00 ;
 		__pixel 2 , p2_score , p2_c ;
 	}
-	let winner : int = 1 ;
+
+	
+
+	let Hinner : int = 1 ;
 	if ( p2_score > p1_score ){
-		 winner = 2 ;
+		 Hinner = 2 ;
 	}
-	return winner ;
+	return __width + p3_toss ;
 }
