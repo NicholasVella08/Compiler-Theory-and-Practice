@@ -1,177 +1,5 @@
 <Function_Decl>
   <Function name>
-    Race
-    </Function name>
-  <params>
-    ('p1_c', ' COLOUR ')
-    ('p2_c', ' COLOUR ')
-    ('score_max', ' INT ')
-    </params>
-  <Return type>
-     INT 
-    </Return type>
-  <Block>
-    <Block>
-      <Statement>
-        <Variable_Decl>
-          <name>
-            a
-            </name>
-          <type>
-             INT 
-            </type>
-          <expr>
-            <Integer>
-              0
-              </Integer>
-            </expr>
-          </Variable_Decl>
-        <Variable_Decl>
-          <name>
-            p1_score
-            </name>
-          <type>
-             INT 
-            </type>
-          <expr>
-            <Expression Op>
-              +
-              </Expression Op>
-            <Left Side>
-              <Expression Op>
-                *
-                </Expression Op>
-              <Left Side>
-                <Integer>
-                  1
-                  </Integer>
-                </Left Side>
-              <Right Side>
-                <ExpVariable>
-                  a
-                  </ExpVariable>
-                </Right Side>
-              </Left Side>
-            <Right Side>
-              <PadWidth>
-                __width
-                </PadWidth>
-              </Right Side>
-            </expr>
-          </Variable_Decl>
-        <ReturnStat>
-          <Expression>
-            <ExpVariable>
-              a
-              </ExpVariable>
-            </Expression>
-          </ReturnStat>
-        </Statement>
-      </Block>
-    </Block>
-  </Function_Decl>
-<Variable_Decl>
-  <name>
-    p1_toss
-    </name>
-  <type>
-     INT 
-    </type>
-  <expr>
-    <PadRandI>
-      __randi
-      </PadRandI>
-    <Expression>
-      <Integer>
-        1000
-        </Integer>
-      </Expression>
-    </expr>
-  </Variable_Decl>
-<Variable_Decl>
-  <name>
-    p2_toss
-    </name>
-  <type>
-     BOOL 
-    </type>
-  <expr>
-    <BooleanLiteral>
-      True
-      </BooleanLiteral>
-    </expr>
-  </Variable_Decl>
-<IF_Stat>
-  <Expression>
-    <Expression Op>
-      >
-      </Expression Op>
-    <Left Side>
-      <ExpVariable>
-        p1_toss
-        </ExpVariable>
-      </Left Side>
-    <Right Side>
-      <ExpVariable>
-        p2_toss
-        </ExpVariable>
-      </Right Side>
-    </Expression>
-  <Block>
-    <Block>
-      <Statement>
-        <Variable_Decl>
-          <name>
-            p1_score
-            </name>
-          <type>
-             INT 
-            </type>
-          <expr>
-            <Integer>
-              0
-              </Integer>
-            </expr>
-          </Variable_Decl>
-        <Variable_Decl>
-          <name>
-            p2_score
-            </name>
-          <type>
-             INT 
-            </type>
-          <expr>
-            <Integer>
-              0
-              </Integer>
-            </expr>
-          </Variable_Decl>
-        <Variable>
-          <Name>
-            p1_score
-            </Name>
-          <Expression>
-            <Expression Op>
-              +
-              </Expression Op>
-            <Left Side>
-              <ExpVariable>
-                p1_score
-                </ExpVariable>
-              </Left Side>
-            <Right Side>
-              <Integer>
-                0
-                </Integer>
-              </Right Side>
-            </Expression>
-          </Variable>
-        </Statement>
-      </Block>
-    </Block>
-  </IF_Stat>
-<Function_Decl>
-  <Function name>
     Tace
     </Function name>
   <params>
@@ -201,6 +29,63 @@
                 1000
                 </Integer>
               </Expression>
+            </expr>
+          </Variable_Decl>
+        <Variable_Decl>
+          <name>
+            p1_score
+            </name>
+          <type>
+             INT 
+            </type>
+          <expr>
+            <Integer>
+              0
+              </Integer>
+            </expr>
+          </Variable_Decl>
+        <Variable_Decl>
+          <name>
+            p1_toss
+            </name>
+          <type>
+             INT 
+            </type>
+          <expr>
+            <PadRandI>
+              __randi
+              </PadRandI>
+            <Expression>
+              <Integer>
+                1000
+                </Integer>
+              </Expression>
+            </expr>
+          </Variable_Decl>
+        <Variable_Decl>
+          <name>
+            p2_score
+            </name>
+          <type>
+             INT 
+            </type>
+          <expr>
+            <Integer>
+              0
+              </Integer>
+            </expr>
+          </Variable_Decl>
+        <Variable_Decl>
+          <name>
+            p2_toss
+            </name>
+          <type>
+             BOOL 
+            </type>
+          <expr>
+            <BooleanLiteral>
+              True
+              </BooleanLiteral>
             </expr>
           </Variable_Decl>
         <IF_Stat>

@@ -1,13 +1,5 @@
 from typing import List
-# class Token:
-#     def __init__(self, token_type, value):
-#         self.type = token_type
-#         self.value = value
-#         print('165165fs1b651s6b1')
-#
-#     def __repr__(self):
-#         print('165165fs1b651s6b1')
-#         return f"{self.type}({self.value})"
+
 
 tokensTable = []
 class Lexer:
@@ -215,14 +207,6 @@ class Lexer:
         else:
             print(f"Invalid syntax! Current token: {input_string}, current state: {self.current_state}")
             #return False, self.current_token, self.current_state, self.table
-
-# class ASTNode:
-#     def __init__(self, value: str, children: List = []):
-#         self.value = value
-#         self.children = children
-#
-#     def __str__(self):
-#         return f"{self.value}: {self.children}"
 
 
 
