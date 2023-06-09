@@ -1,0 +1,17 @@
+fun Race( p1_c : colour , p2_c : colour , score_max : int ) -> int {
+	let a : int = 0 ;
+	let p1_score : int = 1 * a + __width;
+	return a;
+}
+
+let p1_toss : int = __randi 1000 ;
+
+let p2_toss : bool = true;
+
+if ( p1_toss > p2_toss ){
+	let p1_score : int = 0 ;
+	let p2_score : int = 0 ;
+	p1_score = p1_score + 0 ;
+}
+
+
