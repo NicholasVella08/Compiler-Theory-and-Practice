@@ -399,7 +399,7 @@ class Parser:
         self.current_token_index += 1
 
         #print('varibake decl', self.tokenTable[self.current_token_index][0])
-        # Construct and return the VariableDecl AST node
+        
 
         info ={'name': var_name, 'type': var_type, 'expr': expr}
         return {'Variable_Decl': info}
